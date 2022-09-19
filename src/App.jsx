@@ -6,12 +6,9 @@ import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 import ResourcesPage from "./pages/ResourcesPage";
 
-function App() {
-  useState(() => console.log(import.meta.env.VITE_RAPIDAPI_KEY));
-
-  
+function App() {  
   return (
-    <div className="scrollbar">
+    <div>
       <NavBar / >
       <Routes>
         <Route path="/" element={<HomePage />} />

@@ -38,7 +38,13 @@ function NavBar() {
                     {
                         navBarLinks.map((navBarLink) => (
                             <li key={navBarLink.name} className="md:ml-8 text-xl md:my-0 my-7">
-                                <Link to={navBarLink.to} className="hover:text-green-800 duration-200">{navBarLink.name}</Link>
+                                {
+                                    navBarLink.name.toLowerCase() === "source code" 
+                                    ? 
+                                    <a className="hover:text-green-800 duration-200" href="https://github.com/sukaruta/Quakewatch/tree/master"> {navBarLink.name} </a>
+                                    :
+                                    <Link to={navBarLink.to} className="hover:text-green-800 duration-200">{navBarLink.name}</Link>   
+                                }
                             </li>
                         ))
                     }
