@@ -6,7 +6,7 @@ import Dropdown from "../components/Dropdown";
 import { useState } from "react";
 
 function HomePage() {
-    const [ selected, setSelected ] = useState("Last Hour");
+    const [ selected, setSelected ] = useState("Today");
     return (
         <div>
             <div id="canvasContainer" className="h-[100vh] w-full">
