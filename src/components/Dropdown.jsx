@@ -10,7 +10,7 @@ function Dropdown({ selected, setSelected }) {
         on("earthquakeListResponse", () => setIsInteractable(true));
     }, []);
 
-    const options = ["Last Hour", "Last Week", "Last Month", "3 Month Significant"]
+    const options = ["Today", "Significant"]
     return (
         <div className="w-full select-none m-[20px_auto] relative">
             <div className={`p-[15px_20px] bg-white shadow-[3px_3px_10px_6px_rgba(0,0,0,0.06)] 
