@@ -3,7 +3,7 @@ import InfoBox from "../components/InfoBox";
 function AboutPage() {
     return (
         <div className="mx-20 mt-36">
-            <InfoBox headerText={"About The Developer"} paragraphText={"Hello! I'm Paul Macaulay Maravilla. I created this website for my Science PT for 1st Term Physics."}/>
+            <InfoBox headerText={"About The Developer"} paragraphText={"Hello! I created this website for my Science PT for 1st Term Physics."}/>
             <div>
                 <h1 className="font-bold text-4xl mb-5">About The Website</h1>
                 <p className="text-lg mb-10">
