@@ -48,6 +48,9 @@ function ThreeCanvas(props) {
         const atmosphere = new Mesh(
             new SphereGeometry(5, 50, 50),
             new ShaderMaterial({
+              uniforms: {
+                viewDir: { value: new Vector3() }
+              },
               vertexShader: atmosphereVertexShader,
               fragmentShader: atmosphereFragmentShader,
               blending: AdditiveBlending,
@@ -55,6 +58,7 @@ function ThreeCanvas(props) {
             })
           );
         atmosphere.scale.set(1.1, 1.1, 1.1);
+        atmosphere.name = "atmosphere";
         sceneHelper.scene.add(atmosphere);
 
         const sun = new Mesh(
