@@ -111,14 +111,17 @@ export default class SceneHelper {
         window.requestAnimationFrame(this.animate.bind(this));
 
         const globeMesh = this.scene.getObjectByName("globeMesh");
+        const atmosphere = this.scene.getObjectByName("atmosphere");
         const sun = this.scene.getObjectByName("sun");
 
         if (this.enableSpin) globeMesh.rotation.y += 0.001;
 
+        console.log(atmosphere.material.uniforms["viewDir"].value);
         sun.position.x = Math.cos(this.temp) * this.radius;
         sun.position.z = Math.sin(this.temp) * this.radius;
-
         globeMesh.material.uniforms["sunDirection"].value = sun.position;
+        atmosphere.material.uniforms["viewDir"].value = new THREE.Vector3().copy(this.camera.position).negate().normalize();
+
         this.controls.update();
         this.render();
 
