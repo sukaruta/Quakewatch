@@ -7,7 +7,11 @@ import { trigger } from "../libs/Event";
 
 function Earthquakes(props) {
     const [ isLoading, setIsLoading ] = useState(true);
-    const [ earthquakes, setEarthquakes ] = useState([]);
+    const [ earthquakes, setEarthquakes ] = useState({
+        timeScope: props.timeScope.toLowerCase(),
+        today: [],
+        significant: []
+    });
 
     const translator = short();
 
@@ -20,39 +24,43 @@ function Earthquakes(props) {
 
     useEffect(() => {
         setIsLoading(true);
-        const options = {
-            method: 'GET',
-            url: `https://global-earthquake-watch.p.rapidapi.com/${getTimeScope(props.timeScope)}`,
-            headers: {
-                'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
-                'X-RapidAPI-Host': 'global-earthquake-watch.p.rapidapi.com'
-            }
-        };
-    
-        axios.request(options)
-        .then((response) => {
-            setIsLoading(false);
-            setEarthquakes(response.data);
-            trigger("earthquakeListResponse");
-        })
-        .catch((rejectReason) => {
-            returnJSX = <p className="text-red-700"> Failed to fetch earthquake list. Status code: {rejectReason.status} </p>
-            trigger("earthquakeListResponse");
-        });
+        console.log(earthquakes.today.length == 0)
+        console.log(earthquakes.timeScope)
+        if (earthquakes.today.length == 0 && earthquakes.timeScope === "today") getEarthquakesList();
+        else if (earthquakes.significant.length == 0 && earthquakes.timeScope === "significant")  getEarthquakesList();
+
+
+        function getEarthquakesList() {
+            const options = {
+                method: 'GET',
+                url: `https://earthquake-monitor.p.rapidapi.com/${getTimeScope(props.timeScope)}`,
+                headers: {
+                    'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
+                    'X-RapidAPI-Host': 'earthquake-monitor.p.rapidapi.com'
+                }
+            };
+        
+            axios.request(options)
+            .then((response) => {
+                setIsLoading(false);
+                setEarthquakes(earthquake => earthquake.timeScope === "significant" ? earthquake.significant = response.data : earthquake.today = response.data);
+                trigger("earthquakeListResponse");
+            })
+            .catch((rejectReason) => {
+                returnJSX = <p className="text-red-700"> Failed to fetch earthquake list. Status code: {rejectReason.status} </p>
+                trigger("earthquakeListResponse");
+            });
+        }
     }, [props]);
 
     function getTimeScope(timeScope) {
         switch (timeScope.toLowerCase().trim()) {
-            case "last hour":
-                return "hour";
-            case "last week":
-                return "week";
-            case "last month":
-                return "month";
-            case "3 month significant":
+            case "today":
+                return "recent"
+            case "most significant":
                 return "significant";
             default:
-                return "hour";
+                return "recent";
         }
     }
 
@@ -61,14 +69,13 @@ function Earthquakes(props) {
     return (
         <ul className="flex-col">
             {
-                earthquakes.length > 0 ? 
-
-                earthquakes.sort((a, b) => a.magnitude - b.magnitude).map((earthQuake) => (
+                earthquakes[earthquakes.timeScope === "today" ? 1 : 2].length > 0 ? 
+                earthquakes[earthquakes.timeScope].sort((a, b) => a.magnitude - b.magnitude).map((earthQuake) => (
                     <li key={translator.generate()}>
                         <EarthquakeItem 
                             location={earthQuake.location} 
                             magnitude={earthQuake.magnitude}
-                            magnitudeType={earthQuake.magnitudeType}
+                            magnitudeType={earthQuake.magnitude_type}
                             longitude={earthQuake.longitude}
                             latitude={earthQuake.latitude}
                             />
