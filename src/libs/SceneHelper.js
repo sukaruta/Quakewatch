@@ -116,7 +116,6 @@ export default class SceneHelper {
 
         if (this.enableSpin) globeMesh.rotation.y += 0.001;
 
-        console.log(atmosphere.material.uniforms["viewDir"].value);
         sun.position.x = Math.cos(this.temp) * this.radius;
         sun.position.z = Math.sin(this.temp) * this.radius;
         globeMesh.material.uniforms["sunDirection"].value = sun.position;
@@ -189,8 +188,8 @@ export default class SceneHelper {
     }
 
     LootAtGeoCoordinates(data) {
-        let long = confineCoordinateHemispheres(data.detail.longitude);
-        let lat = confineCoordinateHemispheres(data.detail.latitude);
+        let long = parseFloat(data.detail.longitude);
+        let lat = parseFloat(data.detail.latitude);
 
         const potentialDuplicate = this.globeGroup.getObjectByName("globeMesh").children.find(object => object.name === `${long}${lat}`);
         if (potentialDuplicate) {
