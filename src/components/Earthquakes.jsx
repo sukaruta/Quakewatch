@@ -1,19 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import short from "short-uuid";
 
 import EarthquakeItem from "./EarthquakeItem";
 import { trigger } from "../libs/Event";
 
 function Earthquakes(props) {
     const [ isLoading, setIsLoading ] = useState(true);
-    const [ earthquakes, setEarthquakes ] = useState({
-        timeScope: props.timeScope.toLowerCase(),
-        today: [],
-        significant: []
-    });
-
-    const translator = short();
+    const [ earthquakes, setEarthquakes ] = useState([]);
 
     let returnJSX = <div className="justify-center flex">
         <svg className="animate-spin" fill="none" height="20" viewBox="0 0 20 20" width="20" xmlns="http://www.w3.org/2000/svg">
@@ -24,62 +17,48 @@ function Earthquakes(props) {
 
     useEffect(() => {
         setIsLoading(true);
-        console.log(earthquakes.today.length == 0)
-        console.log(earthquakes.timeScope)
-        if (earthquakes.today.length == 0 && earthquakes.timeScope === "today") getEarthquakesList();
-        else if (earthquakes.significant.length == 0 && earthquakes.timeScope === "significant")  getEarthquakesList();
-
+        if (earthquakes.length == 0) getEarthquakesList();
 
         function getEarthquakesList() {
             const options = {
                 method: 'GET',
-                url: `https://earthquake-monitor.p.rapidapi.com/${getTimeScope(props.timeScope)}`,
+                url: `https://everyearthquake.p.rapidapi.com/significant_month.json`,
                 headers: {
                     'X-RapidAPI-Key': import.meta.env.VITE_API_KEY,
-                    'X-RapidAPI-Host': 'earthquake-monitor.p.rapidapi.com'
+                    'X-RapidAPI-Host': 'everyearthquake.p.rapidapi.co'
                 }
             };
         
             axios.request(options)
             .then((response) => {
-                setIsLoading(false);
-                setEarthquakes(earthquake => earthquake.timeScope === "significant" ? earthquake.significant = response.data : earthquake.today = response.data);
+                setEarthquakes(response.data.data); 
                 trigger("earthquakeListResponse");
+                setIsLoading(false);
             })
             .catch((rejectReason) => {
                 returnJSX = <p className="text-red-700"> Failed to fetch earthquake list. Status code: {rejectReason.status} </p>
                 trigger("earthquakeListResponse");
+                setIsLoading(false);
             });
         }
     }, [props]);
-
-    function getTimeScope(timeScope) {
-        switch (timeScope.toLowerCase().trim()) {
-            case "today":
-                return "recent"
-            case "most significant":
-                return "significant";
-            default:
-                return "recent";
-        }
-    }
 
     if (isLoading) return returnJSX;
 
     return (
         <ul className="flex-col">
             {
-                earthquakes[earthquakes.timeScope === "today" ? 1 : 2].length > 0 ? 
-                earthquakes[earthquakes.timeScope].sort((a, b) => a.magnitude - b.magnitude).map((earthQuake) => (
-                    <li key={translator.generate()}>
+                earthquakes.length > 0 ? 
+                earthquakes.sort((a, b) => a.magnitude - b.magnitude).map((earthQuake) => (
+                    <li key={earthQuake.id}>
                         <EarthquakeItem 
                             location={earthQuake.location} 
                             magnitude={earthQuake.magnitude}
-                            magnitudeType={earthQuake.magnitude_type}
+                            magnitudeType={earthQuake.magType}
                             longitude={earthQuake.longitude}
                             latitude={earthQuake.latitude}
                             />
-                    </li>)) : <p> Woo! uh... pretty empty right now... Try another time scope? </p>
+                    </li>)) : <p> I refuse to believe there hasn't been a magnitude 5.5 earthquake in the past month. Is the API broken again? </p>
             }
         </ul>
     )
